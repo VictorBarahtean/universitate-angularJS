@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css">
+<body>
+
+<div ng-app="myApp" ng-controller="namesCtrl" class="container mt-4">
+
+    <p>Cauta: <input type="text" ng-model="test"></p>
+    <p>Categorie: 
+        <select ng-model="selectedCategory">
+            <option value="">Toate</option>
+            <option ng-repeat="x in unique(names, 'category')" >{{x.category}}</option>
+        </select>
+    </p>
+
+    <table border="1" width="100%" class="table">
+        <tr>
+            <th ng-click="orderByMe('name')">Name</th>
+            <th ng-click="orderByMe('price')">Price</th>
+            <th ng-click="orderByMe('category')">Category</th>
+            <th ng-click="orderByMe('count')">Count</th>
+        </tr>
+        <tr ng-repeat="x in names | orderBy:myOrderBy | filter : test | limitTo:selectedNumber | filter:{category:selectedCategory}">
+            <td>{{x.name}}</td>
+            <td>{{x.price}}</td>
+            <td>{{x.category}}</td>
+            <td>{{x.count}}</td>
+        </tr>
+    </table><br>
+    <select ng-model="selectedNumber">
+        <option ng-repeat="n in range(1, names.length)" >{{n}}</option>
+    </select>
+</div>
+
+<script>
+angular.module('myApp', []).controller('namesCtrl', function($scope) {
+    $scope.names = [
+        {name:'aripioare',price:113.4, category: 'carne', count:10},
+        {name:'carne de proc',price:93.2, category: 'carne', count:5},
+        {name:'lapte',price:93.2, category: 'lactate', count:5},
+        {name:'smantana',price:93.2, category: 'lactate', count:5},
+        {name:'branza',price:93.2, category: 'lactate', count:5},
+        {name:'somon',price:93.2, category: 'peste', count:5},
+        {name:'macrou',price:93.2, category: 'peste', count:5},
+        {name:'mere',price:93.2, category: 'fructe', count:5},
+        {name:'pere',price:93.2, category: 'fructe', count:5},
+        {name:'cartofi',price:93.2, category: 'legume', count:5},
+        {name:'morcov',price:93.2, category: 'legume', count:5}
+        ];
+    $scope.orderByMe = function(x) {
+        $scope.myOrderBy = x;
+    }
+
+    // filter unique
+    $scope.unique = function(collection, keyname) {
+            var output = [],
+            keys = [];
+            angular.forEach(collection, function(item) {
+                var key = item[keyname];
+      
+                if (keys.indexOf(key) === -1) {
+                    keys.push(key);
+                    output.push(item);
+                }
+            });
+            return output;
+        };
+    //--------------
+
+
+    $scope.range = function(min, max, step) {
+      step = step || 1;
+      var input = [];
+      for (var i = min; i <= max; i += step) {
+          input.push(i);
+    }
+    return input;
+    };
+    
+});
+</script>
+
+</body>
+</html>
