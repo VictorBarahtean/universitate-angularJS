@@ -1,0 +1,155 @@
+<!doctype html>
+<html ng-app="purchaseApp">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+</head>
+<body ng-controller="purchaseController">
+    <div class="page-header">
+        <h1>Список футболистов </h1>
+    </div>
+    <div class="panel">
+        <div class="form-inline">
+            <div class="form-group">
+                <div class="col-md-8">
+                	<h4>Имя игрока</h4>
+                    <input class="form-control" ng-model="name" placeholder = "Имя игрока"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-8">
+                	<h4>В какой команде играет </h4>
+                    <input class="form-control" ng-model="team" placeholder = "В какой команде играет"/>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="col-md-8">
+                	<h4>Гражданство</h4>
+                    Евросоюз <input type="radio" ng-model="citizenship" value="Евросоюз"> 
+                    <br><br>
+					Молдова<input type="radio"  ng-model="citizenship" value="Молдова">
+                   
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="col-md-8">
+                	<h4>Пол</h4>
+                    Мужской<input type="radio"   ng-model="gender" value="м">
+                    <br><br>
+					Женский<input type="radio"  ng-model="gender" value="ж">
+                </div>
+            </div>
+			<div class="form-group">
+                <div class="col-md-8">
+                	<h4>Женат/замужем</h4>
+                    Да<input type="radio" ng-model="married" value="Да">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6">
+                	<h4>Возраст</h4>
+                    <input type="number" class="form-control" ng-model="age" placeholder="Возраст" />
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="col-md-6">
+                	<h4>Зарплата</h4>
+                    <input type="number" class="form-control" ng-model="salary" placeholder="Зарплата" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-8">
+                    <button class="btn btn-default" ng-click="addItem(name, team, citizenship, gender, married, age, salary)">Добавить</button>
+                </div>
+            </div>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Имя игрока</th>
+                    <th>В какой команде играет</th>
+                    <th>Гражданство</th>
+                    <th>Пол</th>
+                    <th>Женат/замужем</th>
+                    <th>Возраст</th>
+                    <th>Зарплата</th> 
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in list.items">
+                    <td>{{item.name}}</td>
+                    <td>{{item.team}}</td>
+                    <td>{{item.citizenship}}</td>
+                    <td>{{item.gender}}</td>
+                    <td>{{item.married}}</td>
+                    <td>{{item.age}}</td>
+                    <td>{{item.salary}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+ 
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+
+<script>
+var model = {
+    items: [
+        {name: "Дмитрий", team: "Барселона", citizenship: "Евросоюз", gender: "м",  married: "Нет", age: "25", salary: "3784"},
+        {name: "Кирилл", team: "Ювентус", citizenship: "Евросоюз", gender: "м",  married: "Да", age: "33", salary: "9510"},
+        {name: "Евгений", team: "Шериф", citizenship: "Молдова", gender: "м",  married: "Нет", age: "21", salary: "6680"}
+    ]
+};
+var purchaseApp = angular.module("purchaseApp", []);
+    purchaseApp.controller("purchaseController", function ($scope) {
+    $scope.list = model;
+    $scope.name = ""; 
+	$scope.team = "";
+    $scope.citizenship = ""; 
+	$scope.gender = "";
+    $scope.married = ""; 
+	$scope.age = "";
+    $scope.salary = "";
+    $scope.addItem = function (name, team, citizenship, gender, married, age, salary) {
+      if(!name){
+        alert("Numele nu este indicat!");}
+      else if(age < 18 || age > 30){
+            alert("Varsta jucatorului nu se incadreaza limitele date (18 - 30)");}
+      else if(salary < 1000){
+        alert("Salariu este mic. Va subestimti!");
+      }
+      else if(salary > 10000 ){
+        alert("Salariu este mare. Va supra apreciati!");
+      }   
+      if((age<35)&&(salary<10000)&&(salary>1000)){
+        if(name && team && citizenship && gender) 
+        {
+            $scope.list.items.push({ name: name, team: team, citizenship: citizenship, gender: gender, married: "Нет", age: age, salary: salary});
+            
+            $scope.name = ""; 
+			$scope.team = "";
+    		$scope.citizenship = ""; 
+			$scope.gender = "";
+            $scope.married = ""; 
+			$scope.age = "";
+    		$scope.salary = "";
+        }
+	  }
+      else{ 
+      		alert( "Набор закончен" );
+            $scope.name = ""; 
+			$scope.team = "";
+    		$scope.citizenship = ""; 
+			$scope.gender = "";
+            $scope.married = ""; 
+			$scope.age = "";
+    		$scope.salary = "";
+      }
+    }
+});
+</script>
+</body>
+</html>

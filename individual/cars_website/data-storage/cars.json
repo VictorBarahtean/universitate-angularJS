@@ -1,0 +1,8 @@
+{
+    "cars":[
+        {"id":0, "marca":"Mercedes-Benz", "model":" SL", "price":"62", "currency":"$", "details":["2021", "automatic", "petrol", "183mph"], "price_list":["90", "80", "70"],"type":"Sedan","disponibil":true, "image":"image/car-1.png"},
+        {"id":2, "marca":"MG", "model":"HS", "price":"63", "currency":"$", "details":["2021", "automatic", "petrol", "183mph"], "price_list":["90", "80", "70"],"type":"Sedan","disponibil":true, "image":"image/car-2.png"},
+        {"id":1, "marca":"Ford", "model":"Focus ST", "price":"60", "currency":"$", "details":["2019", "automatic", "petrol", "183mph"], "price_list":["90", "80", "70"],"type":"Hatchback", "disponibil":true, "image":"image/car-3.png"},
+        {"id":3, "marca":"Audi", "model":"e-tron", "price":"60", "currency":"$", "details":["2019", "automatic", "petrol", "183mph"], "price_list":["90", "80", "70"],"type":"Hatchback", "disponibil":false, "image":"image/car-4.png"}
+    ]
+}

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car rent</title>
+    
+    <!-- bootstrap -->
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- angular js-->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+   <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css">
+   <!-- my plug -->
+   <script type="text/javascript" src="js/date_picker.js"></script>
+   
+   <link rel="stylesheet" href="css/style.css">
+   
+</head>
+<body>
+
+      <div ng-app="myApp" ng-init="chkIn='00/00/0000';chkOut='00/00/0000';allCar=false;filterOption=true;" class="container mt-3">
+        
+         <header class="header">
+
+           
+        
+            <nav class="navbar">
+                <a href="#vehicles">Masini</a>
+                <a href="#contact">Contact</a>
+                <a href="#about">Despre noi</a>
+                <a href="#other">Altele</a>
+            </nav>
+        
+            <div id="login-btn">
+               <span ng-controller="navBar" style="position: absolute;top:10px;">
+                  {{theTime}}
+               </span>
+               <button class="btn" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#myModal4">login</button>
+               <i class="far fa-user"></i>
+            </div>
+        
+        </header> 
+        <div ng-controller="jsCtrl">
+         <section class="home vehicles" id="vehicles" >
+         
+         
+         
+            <!-- First modal -->
+            <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+               <div class="modal-dialog modal-dialog-centered">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title" id="exampleModalLabel">{{selectCar.marca}} {{selectCar.model}}
+                        <button type="button" class="btn btn-outline-success" ng-disabled="true">{{selectCar.currency}}{{selectCar.price}}/day</button>
+                     </h5>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                     <form >
+                        <div lass="mb-3 mt-3">
+                           <p>Eliberare: <input type="text" class="form-control" ng-change="calcTotalDay()" ng-model="chkIn" datepicker required/></p>
+                           <p>Returnare: <input type="text" class="form-control" ng-change="calcTotalDay()" ng-model="chkOut" datepicker required/></p>
+                           
+                           <p>Numarul de zile:{{totalDays || 0}}</p>
+                           <div ng-switch="priceDay">
+                              <div ng-switch-when="step1">
+                                 <p>Pretul total:{{selectCar.price_list[0] * totalDays || 0}}{{selectCar.currency}}</p>
+                              </div>
+                              <div ng-switch-when="step2">
+                                 <p>Pretul total:{{selectCar.price_list[1] * totalDays || 0}}{{selectCar.currency}}</p>
+                              </div>
+                              <div ng-switch-when="step3">
+                                 <p>Pretul total:{{selectCar.price_list[2] * totalDays || 0}}{{selectCar.currency}}</p>
+                              </div>
+                              <div ng-switch-when="step4">
+                                 <p>Pretul total:{{selectCar.price * totalDays || 0}}{{selectCar.currency}}</p>
+                              </div>
+                           </div>
+
+                           <table class="table" >
+                              <thead>
+                                <tr>
+                                  <th scope="col">1-2 zile</th>
+                                  <th scope="col">3-6 zile</th>
+                                  <th scope="col">7-15 zile</th>
+                                  <th scope="col">16+ zile</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td ng-repeat="pric in selectCar.price_list">{{pric}}</td>
+                                  <td>{{selectCar.price}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                        </div>
+                     </form>
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Inchide</button>
+                     <button type="button" class="btn btn-success" ng-disabled="acceptBrone" data-bs-toggle="modal" data-bs-target="#myModal2">Rezerveaza</button>
+                  </div>
+               </div>
+               </div>
+            </div>
+            <!-- Second modal -->
+            <div class="modal fade" id="myModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+               <div class="modal-dialog modal-dialog-centered">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title" id="exampleModalLabel"> Date de contact</h5>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <form ng-submit="checkPers()" name="myForm">
+                     <div class="modal-body">
+                        
+                           <div lass="mb-3 mt-3">
+                              <div class="alert alert-danger" ng-show="alertCheckPers">
+                                 <p>{{chkVarsta}}</p>
+                              </div>
+                              <p>Nume Prenume: <input type="text" class="form-control" name="nameSurname" ng-model="nameSurname" placeholder="Nume / Prenume" required/></p>
+                              <span style="color:red" ng-show="myForm.nameSurname.$touched && myForm.nameSurname.$invalid">
+                                 Introduceti numele / prenumele.
+                              </span>
+                              <p>Varsta: <input type="number" class="form-control" name="varstaPers" ng-model="varstaPers" placeholder="Varsta" required/></p>
+                              <span style="color:red" ng-show="myForm.varstaPers.$touched && myForm.varstaPers.$invalid">
+                                 Introduceti varsta.
+                              </span>
+                              <p>Data emiterii permisului: <input type="text" class="form-control" name="permisDate" placeholder="Data emiterii" ng-change="calcTotalDay()" ng-model="permisDate" datepicker required/></p>
+                              <span style="color:red" ng-show="myForm.permisDate.$touched && myForm.permisDate.$invalid">
+                                 Alegeti data emiterii permisului.
+                              </span>
+                              <p>Numar de telefon: <input type="text" class="form-control" name="numberPhone" ng-model="numberPhone"placeholder="Telefon" required/></p>
+                              <span style="color:red" ng-show="myForm.numberPhone.$touched && myForm.numberPhone.$invalid">
+                                 Introduceti numarul de telefon.
+                              </span>
+
+                              <p>Pretul total:{{selectCar.price * totalDays || 0}}{{selectCar.currency}}</p>
+                           </div>
+                        
+                     </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Inchide</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#myModal">Inapoi</button>
+                        <input type="submit" class="btn btn-success" value="Rezerveaza">
+                     </div>
+                  </form>
+               </div>
+               </div>
+            </div>
+            <!-- Third modal -->
+            <div class="modal fade" id="myModal3" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+               <div class="modal-dialog modal-dialog-centered">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title" id="exampleModalLabel"> Succes!</h5>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                     <form >
+                        <div lass="mb-3 mt-3">
+                           <p>Ati rezervat masina cu succes!</p>
+                        </div>
+                     </form>
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Inchide</button>
+                  </div>
+               </div>
+               </div>
+            </div>
+            <!-- Fourth modal -->
+            <div class="modal fade" id="myModal4" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+               <div class="modal-dialog modal-dialog-centered">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title" id="exampleModalLabel"> Autentificare</h5>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <form ng-submit="checkPers()" name="myForm">
+                     <div class="modal-body">
+                        
+                           <div lass="mb-3 mt-3">
+                              <div class="alert alert-danger" ng-show="alertCheckPers">
+                                 <p>{{chkVarsta}}</p>
+                              </div>
+                              <p>Login: <input type="text" class="form-control" name="login" ng-model="login" placeholder="Login" required/></p>
+                              <span style="color:red" ng-show="myForm.login.$touched && myForm.login.$invalid">
+                                 Introduceti login-ul.
+                              </span>
+                              <p>Parola: <input type="password" class="form-control" name="parola" ng-model="parola" placeholder="Parola" required/></p>
+                              <span style="color:red" ng-show="myForm.parola.$touched && myForm.parola.$invalid">
+                                 Introduceti parola.
+                              </span>
+                           </div>
+                        
+                     </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Inchide</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#myModal5">Inregistreaza-te</button>
+                        <input type="submit" class="btn btn-success" ng-disabled="myForm.login.$invalid || myForm.parola.$invalid" value="Conecteaza-te">
+                     </div>
+                  </form>
+               </div>
+               </div>
+            </div>
+            <!-- Five modal -->
+            <div class="modal fade" id="myModal5" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+               <div class="modal-dialog modal-dialog-centered">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title" id="exampleModalLabel"> Inregistrare</h5>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <form ng-submit="checkPers()" name="myForm">
+                     <div class="modal-body">
+                        
+                           <div lass="mb-3 mt-3">
+                              <div class="alert alert-danger" ng-show="alertCheckPers">
+                                 <p>{{chkVarsta}}</p>
+                              </div>
+                              <p>Numele Prenumele: <input type="text" class="form-control" name="nume" ng-model="nume" placeholder="Numele Prenumele" required/></p>
+                              <span style="color:red" ng-show="myForm.nume.$touched && myForm.nume.$invalid">
+                                 Introduceti numele si prenumele.
+                              </span>
+                              <p>Login: <input type="text" class="form-control" name="login" ng-model="login" placeholder="Login" required/></p>
+                              <span style="color:red" ng-show="myForm.login.$touched && myForm.login.$invalid">
+                                 Introduceti login-ul.
+                              </span>
+                              <p>Parola: <input type="password" class="form-control" name="parola" ng-model="parola" placeholder="Parola" required/></p>
+                              <span style="color:red" ng-show="myForm.parola.$touched && myForm.parola.$invalid">
+                                 Introduceti parola.
+                              </span>
+                           </div>
+                        
+                     </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Inchide</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#myModal4">Conecteaza-te</button>
+                        <input type="submit" class="btn btn-success" ng-disabled="myForm.login.$invalid || myForm.parola.$invalid" value="Inregistreaza-te">
+                     </div>
+                  </form>
+               </div>
+               </div>
+            </div>
+            <!-- -->
+            <div ng-switch="allCar">
+               <div ng-switch-when="false">
+                  <h1 class="heading">Masini disponibile</h1>
+               </div>
+               <div ng-switch-when="true">
+                  <h1 class="heading">Toate masinile</h1>
+               </div>
+            </div>
+            <nav class="navbar navbar-expand-sm bg-light navbar-light">
+               <div class="container-fluid">
+               <ul class="navbar-nav">
+                  <li class="nav-item">
+                     <button class="nav-link" style="border: none; background-color: transparent;" ng-click="allCar = false">Masini disponibile</button>
+                  </li>
+                  <li class="nav-item">
+                     <button class="nav-link" style="border: none; background-color: transparent;" ng-click="allCar = true">Toate masinile</button>
+                  </li>
+                  <li class="nav-item">
+                     <button class="nav-link" style="border: none; background-color: transparent;" ng-click="filterOption = !filterOption">Filtre</button>
+                  </li>
+               </ul>
+               </div>
+            </nav>
+            <!-- filtre -->
+            <div ng-hide="filterOption">
+               <p>Cauta: <input type="text" class="form-control" ng-model="search_val"></p>
+               <form>
+                  <div class="inline">
+                     <p>Pret:</p>
+                  </div>
+                  <div class="inline">
+                     <input type="number" class="form-control inline"  ng-model="atPret" placeholder="de la">
+                  </div>
+                  <div class="inline">
+                     <p>-</p>
+                  </div>
+                  <div class="inline">
+                     <input type="number" class="form-control inline"  ng-model="toPret" placeholder="pana la">
+                  </div>
+                  
+               </form>
+               <div>
+                  <div class='inline'>
+                     <input type="radio" class="form-check-input inline" name="search_val_type" ng-model="search_val_type" ng-value="''" checked="true">Toate masinile
+                  </div>
+                  <div  ng-repeat="car in cars.cars | groupBy: 'type'" class='inline'>
+                     <input type="radio" class="form-check-input inline" name="search_val_type" ng-model="$parent.search_val_type" ng-value="car.type">{{car.type}}
+                  </div>
+               </div>
+               
+            </div>
+            <!-- -->
+            
+
+            <div  ng-repeat="car in cars.cars | filter: search_val | filter: search_val_type | betweenPrice:[atPret, toPret] | availableCars: allCar | limitTo : 8" class='inline'>
+               <div class="card box" style="width: 18rem;">
+                  <img src="{{car.image}}" class="card-img-top">
+                  
+                  <div class="card-body">
+                  <h5 class="card-title">{{car.marca}} {{car.model}}</h5>
+                  <p class="card-text">
+                        <ul class="list-group list-group-flush" >
+                           <li class="list-group-item" ng-repeat="detail in car.details">{{detail}}</li>
+                           <li class="list-group-item">{{car.type}}</li>
+                        </ul>
+                  </p>
+                  <button type="button" class="btn btn-outline-success" ng-disabled="true">{{car.currency}}{{car.price}}/day</button>
+                  <button class="btn btn-primary" ng-show="car.disponibil" ng-click="getCarWithId(car.id)" data-bs-toggle="modal" data-bs-target="#myModal">Rezerveaza</button>
+                  <button class="btn btn-info" ng-hide="car.disponibil" ng-disabled="true">Rezervat</button>
+                  </div>
+               </div>
+            </div>
+         
+      
+   </section>
+   <section class="contact container mt-3" id="contact" ng-mousemove="isCopy=false">
+      <h1 class="heading p-3">Contacte</h1>
+      <input type="text" class="form-control w-50" ng-disabled="true" ng-copy="isCopy=true" value="Bulevardul Constantin Negruzzi 7, Chișinău 2001">
+      <div ng-if="isCopy">
+         <span >Adresa a fost copiata.</span>
+      </div>
+
+      <div class="row">
+         <iframe class="map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d869.325965791002!2d28.84871022534325!3d47.013362274266754!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40c97c22a0f0005d%3A0x8f3b0d6574b9d5cc!2sRent%20a%20car%20Chisinau%20Car%20rental%20Chisinau!5e0!3m2!1sen!2sin!4v1670004963860!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+   </section>
+   <section class="contact container mt-3" id="about" >
+      <h1 class="heading">Despre noi</h1>
+      <video width="1280" height="720" controls>
+         <source src="video/rent_car.mp4" type="video/mp4">
+         Brauzerul tau nu suporta tagul video.
+      </video>
+   </section>
+   <section class="other container mt-3" id="other">
+      <h1 class="heading">Altele</h1>
+      <p>ng-non-bindable:</p>
+      <span ng-non-bindable>{{5 + 5}}</span> = {{5 + 5}}
+      <h1>Persoane care au bronat masina</h1>
+      
+      <div class="container card">
+            <div ng-if="brones.brones.length > 0">
+               <span>Cauta:<input type="text" class="form-input" ng-model="searchString"></span>
+               <table class="table"  >
+                  <thead>
+                        <tr>
+                           <th scope="col">#</th>
+                           <th scope="col">Numele / Prenume</th>
+                           <th scope="col">Varsta</th>
+                           <th scope="col">Data emiterii permisului</th>
+                           <th scope="col">Varsta permisului</th>
+                           <th scope="col">Telefon</th>
+                           <th scope="col">Id masina</th>
+                           <th scope="col"></th>
+                        </tr>
+                  </thead>
+                  <tbody>
+                        <tr ng-repeat="brone in brones.brones | limitTo: rowInList | filter: searchString">
+                           <th scope="row">{{brone.id}}</th>
+                           <td>{{brone.name}}</td>
+                           <td>{{brone.age}}</td>
+                           <td>{{brone.age_permis}}</td>
+                           <td>{{brone.staj_permis}}</td>
+                           <td>{{brone.telefon}}</td>
+                           <td>{{brone.masina_id}}</td>
+                           <td> <button class="btn btn-outline-danger" ng-click="stergeBrone(brone.id)">Sterge</button></td>
+                        </tr>
+                  </tbody>
+               </table>
+
+               <span><label>Numarul de cereri: </label>
+                  <input class="form-input" type="text" ng-copy="isCopyTable=true" ng-model="rowInList">
+               </span>
+            </div>
+            
+            <div ng-if="brones.brones.length == 0" class="container text-center" ng-disabled="false">
+               <h3>La moment nu sunt persoane cu bronari</h3>
+            </div>
+      </div>
+   </section>
+</div>
+</div>
+</body>
+<!-- my plug -->
+<script type="text/javascript" src="js/read_cars.js"></script>
+
+</html>
